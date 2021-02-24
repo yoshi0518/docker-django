@@ -1,0 +1,95 @@
+version: '3.8'
+
+# Service definition
+services:
+
+  mysql:
+    # Dockerfile
+    build: ./mysql
+    # Image Name
+    image: docker-django/mysql:8.0.23
+    # Container Name
+    container_name: mysql
+    # Environment
+    environment:
+      MYSQL_ROOT_PASSWORD: Sys@dm!n01
+      MYSQL_DATABASE: django
+      MYSQL_USER: user
+      MYSQL_PASSWORD: P@ssword01
+      TZ: 'Asia/Tokyo'
+    # Mount host directory(host:container)
+    volumes:
+      - ./mysql/share:/share
+      - ./mysql/config/my.cnf:/etc/my.cnf
+      - ./mysql/data:/var/lib/mysql
+    # Port forwarding(host:container)
+    ports:
+      - 3306:3306
+    # Network
+    networks:
+      - my-network
+    # Restart
+    restart: always
+
+  django:
+    # Dockerfile
+    build: ./django
+    # Image Name
+    image: docker-django/django:3.1
+    # Container Name
+    container_name: django
+    volumes:
+      - ./django/share:/share
+    # Port forwarding(host:container)
+    ports:
+      - 8000:8000
+    # Network
+    networks:
+      - my-network
+    # Continue container startup
+    stdin_open: true
+    tty: true
+    # Container dependencies
+    depends_on:
+      - mysql
+    # Connect a container to another container
+    links:
+      - mysql
+    # Restart
+    restart: always
+
+  phpmyadmin:
+    # Dockerfile
+    build: ./phpmyadmin
+    # Image Name
+    image: docker-django/phpmyadmin:5.0.4
+    # Container Name
+    container_name: phpmyadmin
+    # Environment
+    environment:
+      PMA_ARBITRARY: 1
+      PMA_HOSTS: mysql
+      PMA_USER: root
+      PMA_PASSWORD: Sys@dm!n01
+    # Mount host directory(host:container)
+    volumes:
+      - ./phpmyadmin/share:/share
+    # Port forwarding(host:container)
+    ports:
+      - 8080:80
+    # Network
+    networks:
+      - my-network
+    # Container dependencies
+    depends_on:
+      - mysql
+    # Connect a container to another container
+    links:
+      - mysql
+    # Restart
+    restart: always
+
+# Network definition
+networks:
+  my-network:
+    external: true
