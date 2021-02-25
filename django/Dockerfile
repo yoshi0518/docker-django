@@ -8,6 +8,7 @@ WORKDIR /share
 RUN apt-get update && \
   apt-get upgrade -y && \
   apt-get install -y git && \
+  apt-get install -y default-mysql-client && \
   rm -rf /var/lib/apt/lists/*
 
 # Python Package Install
