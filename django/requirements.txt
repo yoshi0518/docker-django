@@ -1,2 +1,6 @@
 django==3.1
+django-debug-toolbar
+django-extensions
+django-import-export
 mysqlclient==2.0.3
+Werkzeug
